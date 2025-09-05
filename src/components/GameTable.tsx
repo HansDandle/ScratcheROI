@@ -13,8 +13,8 @@ type SortField = 'expectedValue' | 'currentExpectedValue' | 'gameName' | 'roi' |
 type SortDirection = 'asc' | 'desc';
 
 export function GameTable({ games, expandedRows, setExpandedRows }: GameTableProps) {
-  const [sortField, setSortField] = useState<SortField>('expectedValue');
-  const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+  const [sortField, setSortField] = useState<SortField>('currentExpectedValue');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   const [priceFilter, setPriceFilter] = useState<string>('all');
 
   const toggleRow = (gameNumber: string) => {
@@ -163,20 +163,20 @@ export function GameTable({ games, expandedRows, setExpandedRows }: GameTablePro
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 <button
-                  onClick={() => handleSort('expectedValue')} 
-                  className="flex items-center space-x-1 hover:text-gray-700"
-                >
-                  <span>Expected Value</span>
-                  <SortIcon field="expectedValue" />
-                </button>
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                <button
                   onClick={() => handleSort('currentExpectedValue')} 
                   className="flex items-center space-x-1 hover:text-gray-700"
                 >
                   <span>Current EV</span>
                   <SortIcon field="currentExpectedValue" />
+                </button>
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <button
+                  onClick={() => handleSort('expectedValue')} 
+                  className="flex items-center space-x-1 hover:text-gray-700"
+                >
+                  <span>Expected Value</span>
+                  <SortIcon field="expectedValue" />
                 </button>
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -238,13 +238,13 @@ export function GameTable({ games, expandedRows, setExpandedRows }: GameTablePro
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`font-semibold ${getExpectedValueColor(game.expectedValue ?? 0)}`}>
-                        ${(game.expectedValue ?? 0).toFixed(2)}
+                      <span className={`font-semibold ${getExpectedValueColor(game.currentExpectedValue ?? 0)}`}>
+                        ${(game.currentExpectedValue ?? 0).toFixed(2)}
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`font-semibold ${getExpectedValueColor(game.currentExpectedValue ?? 0)}`}>
-                        ${(game.currentExpectedValue ?? 0).toFixed(2)}
+                      <span className={`font-semibold ${getExpectedValueColor(game.expectedValue ?? 0)}`}>
+                        ${(game.expectedValue ?? 0).toFixed(2)}
                       </span>
                     </td>
                     <td className="px-6 py-4">
