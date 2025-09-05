@@ -267,7 +267,7 @@ export function GameTable({ games, expandedRows, setExpandedRows }: GameTablePro
                   {isExpanded && (
                     <tr>
                       <td colSpan={7} className="px-3 sm:px-6 py-4 bg-gray-50">
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div className="space-y-6">
                           {/* Game Details */}
                           <div>
                             <h4 className="font-semibold text-gray-800 mb-3">Game Details</h4>
