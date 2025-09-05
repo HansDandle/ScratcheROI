@@ -40,6 +40,30 @@ class LotteryScraper {
     }
   }
 
+  private async fetchCachedData(): Promise<GameDetailedInfo[] | null> {
+    try {
+      const response = await fetch('/.netlify/functions/get-cached-data');
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      return data.games || null;
+    } catch (error) {
+      console.error('Failed to fetch cached data:', error);
+      return null;
+    }
+  }
+
+  private isDataStale(lastUpdated: string): boolean {
+    const lastUpdate = new Date(lastUpdated);
+    const now = new Date();
+    const hoursSinceUpdate = (now.getTime() - lastUpdate.getTime()) / (1000 * 60 * 60);
+    
+    // Consider data stale if it's more than 24 hours old
+    return hoursSinceUpdate > 24;
+  }
+
   private parseMainPageTable(html: string): GameBasicInfo[] {
     const games: GameBasicInfo[] = [];
     

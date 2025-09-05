@@ -16,16 +16,50 @@ export function useLotteryScraper() {
   useEffect(() => {
     lotteryScraper.onStatusUpdate(setStatus);
     
-    // Load cached data if available
-    const cachedData = localStorage.getItem('lotteryData');
-    if (cachedData) {
-      try {
-        const parsedData = JSON.parse(cachedData);
-        setGames(parsedData);
-      } catch (error) {
-        console.error('Failed to parse cached data:', error);
+    // Load cached data on component mount
+    const loadCachedData = async () => {
+      // First try localStorage
+      const localData = localStorage.getItem('lotteryData');
+      const localTimestamp = localStorage.getItem('lotteryDataTimestamp');
+      
+      if (localData && localTimestamp) {
+        try {
+          const parsedData = JSON.parse(localData);
+          const timestamp = new Date(localTimestamp);
+          const now = new Date();
+          const hoursSinceUpdate = (now.getTime() - timestamp.getTime()) / (1000 * 60 * 60);
+          
+          // If local data is less than 24 hours old, use it
+          if (hoursSinceUpdate < 24) {
+            setGames(parsedData);
+            return;
+          }
+        } catch (error) {
+          console.error('Failed to parse cached data:', error);
+        }
       }
-    }
+      
+      // If no valid local data, try to fetch from server
+      try {
+        setIsLoading(true);
+        const response = await fetch('/.netlify/functions/get-cached-data');
+        if (response.ok) {
+          const data = await response.json();
+          if (data.games && data.games.length > 0) {
+            setGames(data.games);
+            // Cache the data locally
+            localStorage.setItem('lotteryData', JSON.stringify(data.games));
+            localStorage.setItem('lotteryDataTimestamp', data.lastUpdated);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch cached data from server:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    loadCachedData();
   }, []);
 
   const startScraping = async () => {
@@ -36,6 +70,7 @@ export function useLotteryScraper() {
       
       // Cache the data
       localStorage.setItem('lotteryData', JSON.stringify(scrapedGames));
+      localStorage.setItem('lotteryDataTimestamp', new Date().toISOString());
     } catch (error) {
       console.error('Scraping failed:', error);
     } finally {
