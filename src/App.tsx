@@ -33,16 +33,16 @@ function App() {
         gamesCount={games.length}
       />
       
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
         <ScrapingStatus status={status} />
         
         {games.length > 0 && (
           <>
             <Dashboard games={games} onNavigateToGame={handleNavigateToGame} />
             
-            <div className="mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Scratch-Off Data Analysis</h2>
-              <p className="text-gray-600">Detailed breakdown of all active scratch-off games</p>
+            <div className="mb-4 sm:mb-6">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Scratch-Off Data Analysis</h2>
+              <p className="text-sm sm:text-base text-gray-600">Detailed breakdown of all active scratch-off games</p>
             </div>
 
             <GameTable 
@@ -55,12 +55,12 @@ function App() {
 
         {games.length === 0 && !isLoading && !status.isActive && (
           <div className="text-center py-16">
-            <Target className="mx-auto h-16 w-16 text-gray-400 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No Data Available</h3>
-            <p className="text-gray-600 mb-6">Click "Refresh Data" to scrape all Texas Lottery scratch-off data</p>
+            <Target className="mx-auto h-12 w-12 sm:h-16 sm:w-16 text-gray-400 mb-4" />
+            <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2">No Data Available</h3>
+            <p className="text-sm sm:text-base text-gray-600 mb-6 px-4">Tap "Refresh Data" to scrape all Texas Lottery scratch-off data</p>
             <button
               onClick={startScraping}
-              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+              className="inline-flex items-center px-6 py-3 border border-transparent text-sm sm:text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 min-h-[44px]"
             >
               <RefreshCw className="w-5 h-5 mr-2" />
               Start Analysis
@@ -71,9 +71,9 @@ function App() {
 
       {games.length > 0 && (
         <footer className="bg-white border-t border-gray-200 py-8">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
             <div className="text-center">
-              <p className="text-sm text-gray-500">
+              <p className="text-xs sm:text-sm text-gray-500">
                 Last updated: {games[0]?.lastUpdated ? new Date(games[0].lastUpdated).toLocaleString() : 'Never'} | {games.length} games analyzed
               </p>
               <p className="text-xs text-gray-400 mt-1">

@@ -125,17 +125,17 @@ export function GameTable({ games, expandedRows, setExpandedRows }: GameTablePro
 
   return (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-      <div className="p-6 border-b border-gray-200">
-        <h2 className="text-xl font-semibold mb-4">Game Analysis - Expandable View</h2>
-        <div className="mb-4 p-3 bg-blue-50 rounded-lg text-sm text-blue-800">
-          <strong>Click any row to expand and see detailed prize tier odds and game information.</strong>
+      <div className="p-4 sm:p-6 border-b border-gray-200">
+        <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Game Analysis - Expandable View</h2>
+        <div className="mb-3 sm:mb-4 p-3 bg-blue-50 rounded-lg text-xs sm:text-sm text-blue-800">
+          <strong>Tap any row to expand and see detailed prize tier odds and game information.</strong>
         </div>
-        <div className="flex items-center space-x-4">
+        <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
           <label className="text-sm font-medium text-gray-700">Filter by Price:</label>
           <select 
             value={priceFilter} 
             onChange={(e) => setPriceFilter(e.target.value)}
-            className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+            className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 min-h-[44px] text-base"
           >
             <option value="all">All Prices</option>
             {uniquePrices.map(price => (
@@ -145,7 +145,7 @@ export function GameTable({ games, expandedRows, setExpandedRows }: GameTablePro
         </div>
       </div>
 
-      <div className="overflow-x-auto relative h-[600px]">
+      <div className="overflow-x-auto relative h-[400px] sm:h-[600px]">
         <table className="w-full">
           <thead className="bg-gray-100 sticky top-0 z-10">
             <tr>
@@ -154,7 +154,7 @@ export function GameTable({ games, expandedRows, setExpandedRows }: GameTablePro
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 <button
-                  onClick={() => handleSort('gameName')}
+                  onClick={() => handleSort('gameName')} 
                   className="flex items-center space-x-1 hover:text-gray-700"
                 >
                   <span>Game</span>
@@ -163,7 +163,7 @@ export function GameTable({ games, expandedRows, setExpandedRows }: GameTablePro
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 <button
-                  onClick={() => handleSort('expectedValue')}
+                  onClick={() => handleSort('expectedValue')} 
                   className="flex items-center space-x-1 hover:text-gray-700"
                 >
                   <span>Expected Value</span>
@@ -172,7 +172,7 @@ export function GameTable({ games, expandedRows, setExpandedRows }: GameTablePro
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 <button
-                  onClick={() => handleSort('currentExpectedValue')}
+                  onClick={() => handleSort('currentExpectedValue')} 
                   className="flex items-center space-x-1 hover:text-gray-700"
                 >
                   <span>Current EV</span>
@@ -181,7 +181,7 @@ export function GameTable({ games, expandedRows, setExpandedRows }: GameTablePro
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 <button
-                  onClick={() => handleSort('evDelta')}
+                  onClick={() => handleSort('evDelta')} 
                   className="flex items-center space-x-1 hover:text-gray-700"
                 >
                   <span>EV Delta</span>
@@ -190,7 +190,7 @@ export function GameTable({ games, expandedRows, setExpandedRows }: GameTablePro
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 <button
-                  onClick={() => handleSort('roi')}
+                  onClick={() => handleSort('roi')} 
                   className="flex items-center space-x-1 hover:text-gray-700"
                 >
                   <span>ROI %</span>
@@ -199,7 +199,7 @@ export function GameTable({ games, expandedRows, setExpandedRows }: GameTablePro
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 <button
-                  onClick={() => handleSort('currentOdds')}
+                  onClick={() => handleSort('currentOdds')} 
                   className="flex items-center space-x-1 hover:text-gray-700"
                 >
                   <span>Current Odds</span>
@@ -218,7 +218,7 @@ export function GameTable({ games, expandedRows, setExpandedRows }: GameTablePro
               return (
                 <React.Fragment key={game.gameNumber || 0}>
                   <tr 
-                    className="hover:bg-gray-50 transition-colors duration-150 cursor-pointer"
+                    className="hover:bg-gray-50 active:bg-gray-100 transition-colors duration-150 cursor-pointer"
                     data-game-number={game.gameNumber}
                     onClick={() => toggleRow(game.gameNumber || '')}
                   >
@@ -229,11 +229,11 @@ export function GameTable({ games, expandedRows, setExpandedRows }: GameTablePro
                         <ChevronRight className="w-4 h-4 text-gray-500" />
                       )}
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4">
                       <div className="flex items-center">
                         <div>
-                          <p className="font-medium text-gray-900">{game.gameName}</p>
-                          <p className="text-sm text-gray-500">#{game.gameNumber} • ${game.ticketPrice}</p>
+                          <p className="font-medium text-gray-900 text-sm sm:text-base">{game.gameName}</p>
+                          <p className="text-xs sm:text-sm text-gray-500">#{game.gameNumber} • ${game.ticketPrice}</p>
                         </div>
                       </div>
                     </td>
@@ -266,7 +266,7 @@ export function GameTable({ games, expandedRows, setExpandedRows }: GameTablePro
                   
                   {isExpanded && (
                     <tr>
-                      <td colSpan={7} className="px-6 py-4 bg-gray-50">
+                      <td colSpan={7} className="px-3 sm:px-6 py-4 bg-gray-50">
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                           {/* Game Details */}
                           <div>
@@ -310,7 +310,7 @@ export function GameTable({ games, expandedRows, setExpandedRows }: GameTablePro
                           {/* Prize Tier Odds */}
                           <div>
                             <h4 className="font-semibold text-gray-800 mb-3">Prize Tier Odds</h4>
-                            <div className="max-h-64 overflow-y-auto">
+                            <div className="max-h-48 sm:max-h-64 overflow-y-auto">
                               <table className="w-full text-sm">
                                 <thead className="bg-gray-100">
                                   <tr>
@@ -323,7 +323,7 @@ export function GameTable({ games, expandedRows, setExpandedRows }: GameTablePro
                                 <tbody className="divide-y divide-gray-200">
                                   {prizeTierOdds.map((prize, index) => (
                                     <tr key={index} className="hover:bg-gray-50">
-                                      <td className="px-3 py-2 font-medium">{prize.amount}</td>
+                                      <td className="px-2 sm:px-3 py-2 font-medium text-xs sm:text-sm">{prize.amount}</td>
                                       <td className="px-3 py-2">
                                         <span className={prize.remaining === 0 ? 'text-red-600 font-medium' : ''}>
                                           {prize.remaining.toLocaleString()}
@@ -332,9 +332,9 @@ export function GameTable({ games, expandedRows, setExpandedRows }: GameTablePro
                                           / {prize.totalInGame.toLocaleString()}
                                         </span>
                                       </td>
-                                      <td className="px-3 py-2">{prize.startingOdds}</td>
-                                      <td className="px-3 py-2">
-                                        <span className={prize.remaining === 0 ? 'text-red-600' : ''}>
+                                      <td className="px-2 sm:px-3 py-2 text-xs sm:text-sm">{prize.startingOdds}</td>
+                                      <td className="px-2 sm:px-3 py-2 text-xs sm:text-sm">
+                                        <span className={prize.remaining === 0 ? 'text-red-600' : 'text-gray-900'}>
                                           {prize.currentOdds}
                                         </span>
                                       </td>
