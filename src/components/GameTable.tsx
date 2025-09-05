@@ -272,36 +272,36 @@ export function GameTable({ games, expandedRows, setExpandedRows }: GameTablePro
                           <div>
                             <h4 className="font-semibold text-gray-800 mb-3">Game Details</h4>
                             <div className="space-y-2 text-sm">
-                              <div className="flex justify-between">
-                                <span className="text-gray-600">Start Date:</span>
+                              <div>
+                                <span className="text-gray-600">Start Date: </span>
                                 <span className="font-medium">{game.startDate}</span>
                               </div>
-                              <div className="flex justify-between">
-                                <span className="text-gray-600">Top Prize:</span>
+                              <div>
+                                <span className="text-gray-600">Top Prize: </span>
                                 <span className="font-medium">
                                   {game.prizeBreakdown && game.prizeBreakdown.length > 0 
                                     ? game.prizeBreakdown[0].amount 
                                     : game.topPrizeAmount}
                                 </span>
                               </div>
-                              <div className="flex justify-between">
-                                <span className="text-gray-600">Total Tickets:</span>
+                              <div>
+                                <span className="text-gray-600">Total Tickets: </span>
                                 <span className="font-medium">{(game.totalTickets ?? 0).toLocaleString()}</span>
                               </div>
-                              <div className="flex justify-between">
-                                <span className="text-gray-600">Tickets Remaining:</span>
+                              <div>
+                                <span className="text-gray-600">Tickets Remaining: </span>
                                 <span className="font-medium">{(game.remainingTickets ?? 0).toLocaleString()}</span>
                               </div>
-                              <div className="flex justify-between">
-                                <span className="text-gray-600">Overall Odds (Start):</span>
+                              <div>
+                                <span className="text-gray-600">Overall Odds (Start): </span>
                                 <span className="font-medium">{game.overallOdds}</span>
                               </div>
-                              <div className="flex justify-between">
-                                <span className="text-gray-600">Grand Prize Odds (Start):</span>
+                              <div>
+                                <span className="text-gray-600">Grand Prize Odds (Start): </span>
                                 <span className="font-medium">{game.startingGrandPrizeOdds}</span>
                               </div>
-                              <div className="flex justify-between">
-                                <span className="text-gray-600">Grand Prize Odds (Current):</span>
+                              <div>
+                                <span className="text-gray-600">Grand Prize Odds (Current): </span>
                                 <span className="font-medium">{game.currentGrandPrizeOdds}</span>
                               </div>
                             </div>
