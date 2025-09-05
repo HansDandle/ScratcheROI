@@ -7,7 +7,6 @@ interface GameTableProps {
   games: GameDetailedInfo[];
 }
 
-type SortField = 'expectedValue' | 'currentExpectedValue' | 'gameName' | 'roi' | 'currentOdds';
 type SortField = 'expectedValue' | 'currentExpectedValue' | 'gameName' | 'roi' | 'currentOdds' | 'evDelta';
 type SortDirection = 'asc' | 'desc';
 
