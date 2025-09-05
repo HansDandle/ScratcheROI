@@ -40,8 +40,6 @@ function App() {
           <>
             <Dashboard games={games} onNavigateToGame={handleNavigateToGame} />
             
-            <Dashboard games={games} />
-            
             <div className="mb-6">
               <h2 className="text-2xl font-bold text-gray-900">Scratch-Off Data Analysis</h2>
               <p className="text-gray-600">Detailed breakdown of all active scratch-off games</p>
