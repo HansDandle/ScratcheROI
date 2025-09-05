@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Header } from './components/Header';
 import { Dashboard } from './components/Dashboard';
+import { Dashboard } from './components/Dashboard';
 import { GameTable } from './components/GameTable';
 import { ScrapingStatus } from './components/ScrapingStatus';
 import { useLotteryScraper } from './hooks/useLotteryScraper';
@@ -8,6 +9,22 @@ import { Target, RefreshCw } from 'lucide-react';
 
 function App() {
   const { games, status, isLoading, startScraping } = useLotteryScraper();
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+
+  const handleNavigateToGame = (gameNumber: string) => {
+    // Expand the target game
+    const newExpanded = new Set(expandedRows);
+    newExpanded.add(gameNumber);
+    setExpandedRows(newExpanded);
+
+    // Scroll to the game row
+    setTimeout(() => {
+      const gameRow = document.querySelector(`[data-game-number="${gameNumber}"]`);
+      if (gameRow) {
+        gameRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -22,6 +39,8 @@ function App() {
         
         {games.length > 0 && (
           <>
+            <Dashboard games={games} onNavigateToGame={handleNavigateToGame} />
+            
             <Dashboard games={games} />
             
             <div className="mb-6">
@@ -29,7 +48,11 @@ function App() {
               <p className="text-gray-600">Detailed breakdown of all active scratch-off games</p>
             </div>
 
-            <GameTable games={games} />
+            <GameTable 
+              games={games} 
+              expandedRows={expandedRows}
+              setExpandedRows={setExpandedRows}
+            />
           </>
         )}
 

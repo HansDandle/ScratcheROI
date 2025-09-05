@@ -5,16 +5,17 @@ import { StickyScrollbar } from './StickyScrollbar';
 
 interface GameTableProps {
   games: GameDetailedInfo[];
+  expandedRows: Set<string>;
+  setExpandedRows: (expanded: Set<string>) => void;
 }
 
 type SortField = 'expectedValue' | 'currentExpectedValue' | 'gameName' | 'roi' | 'currentOdds' | 'evDelta';
 type SortDirection = 'asc' | 'desc';
 
-export function GameTable({ games }: GameTableProps) {
+export function GameTable({ games, expandedRows, setExpandedRows }: GameTableProps) {
   const [sortField, setSortField] = useState<SortField>('expectedValue');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   const [priceFilter, setPriceFilter] = useState<string>('all');
-  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
   const toggleRow = (gameNumber: string) => {
     const newExpanded = new Set(expandedRows);
@@ -218,6 +219,7 @@ export function GameTable({ games }: GameTableProps) {
                 <React.Fragment key={game.gameNumber || 0}>
                   <tr 
                     className="hover:bg-gray-50 transition-colors duration-150 cursor-pointer"
+                    data-game-number={game.gameNumber}
                     onClick={() => toggleRow(game.gameNumber || '')}
                   >
                     <td className="px-6 py-4">
