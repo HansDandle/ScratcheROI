@@ -23,9 +23,16 @@ class LotteryScraper {
 
   private async fetchWithProxy(url: string): Promise<string> {
     try {
-      // Use Vite dev server proxy
-      const proxyUrl = `/api${url}`;
+      // Use Netlify function in production, Vite proxy in development
+      const proxyUrl = import.meta.env.DEV 
+        ? `/api${url}` 
+        : `/.netlify/functions/lottery-proxy?path=${encodeURIComponent(url)}`;
       const response = await fetch(proxyUrl);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
       return await response.text();
     } catch (error) {
       console.error('Fetch error:', error);
