@@ -74,7 +74,14 @@ function App() {
           <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
             <div className="text-center">
               <p className="text-xs sm:text-sm text-gray-500">
-                Last updated: {games[0]?.lastUpdated ? new Date(games[0].lastUpdated).toLocaleString() : 'Never'} | {games.length} games analyzed
+                Last updated: {games[0]?.lastUpdated ? new Date(games[0].lastUpdated).toLocaleString('en-US', {
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric',
+                  hour: 'numeric',
+                  minute: '2-digit',
+                  timeZoneName: 'short'
+                }) : 'Never'} | {games.length} games analyzed
               </p>
               <p className="text-xs text-gray-400 mt-1">
                 Data scraped from Texas Lottery official website. Use responsibly.

@@ -22,9 +22,9 @@ export function Header({ onStartScraping, isLoading, gamesCount }: HeaderProps) 
           
           <div className="flex items-center space-x-2 sm:space-x-4">
             {gamesCount > 0 && (
-              <span className="text-xs sm:text-sm text-gray-600 hidden sm:inline">
-                {gamesCount} games analyzed
-              </span>
+              <div className="text-xs sm:text-sm text-gray-600 hidden sm:block">
+                <div>{gamesCount} games</div>
+              </div>
             )}
             <button
               onClick={onStartScraping}

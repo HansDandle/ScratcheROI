@@ -1,6 +1,6 @@
 import React from 'react';
 import { GameDetailedInfo } from '../types/lottery';
-import { TrendingUp, DollarSign, Target, Percent } from 'lucide-react';
+import { TrendingUp, DollarSign, Target, Clock } from 'lucide-react';
 
 interface DashboardProps {
   games: GameDetailedInfo[];
@@ -68,11 +68,18 @@ export function Dashboard({ games, onNavigateToGame }: DashboardProps) {
 
       <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 border-l-4 border-orange-500">
         <div className="flex items-center">
-          <Percent className="h-6 w-6 sm:h-8 sm:w-8 text-orange-500 flex-shrink-0" />
+          <Clock className="h-6 w-6 sm:h-8 sm:w-8 text-orange-500 flex-shrink-0" />
           <div className="ml-3 sm:ml-4 min-w-0">
-            <p className="text-xs sm:text-sm font-medium text-gray-600">Total Games</p>
-            <p className="text-xl sm:text-2xl font-bold text-gray-900">{games.length}</p>
-            <p className="text-xs text-gray-500">Active scratch-offs</p>
+            <p className="text-xs sm:text-sm font-medium text-gray-600">Last Updated</p>
+            <p className="text-sm sm:text-lg font-bold text-gray-900">
+              {games[0]?.lastUpdated ? new Date(games[0].lastUpdated).toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit'
+              }) : 'Never'}
+            </p>
+            <p className="text-xs text-gray-500">{games.length} games analyzed</p>
           </div>
         </div>
       </div>
