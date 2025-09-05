@@ -14,7 +14,7 @@ type SortDirection = 'asc' | 'desc';
 
 export function GameTable({ games, expandedRows, setExpandedRows }: GameTableProps) {
   const [sortField, setSortField] = useState<SortField>('currentExpectedValue');
-  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   const [priceFilter, setPriceFilter] = useState<string>('all');
 
   const toggleRow = (gameNumber: string) => {
