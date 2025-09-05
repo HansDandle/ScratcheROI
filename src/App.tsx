@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Header } from './components/Header';
 import { Dashboard } from './components/Dashboard';
-import { Dashboard } from './components/Dashboard';
 import { GameTable } from './components/GameTable';
 import { ScrapingStatus } from './components/ScrapingStatus';
 import { useLotteryScraper } from './hooks/useLotteryScraper';
