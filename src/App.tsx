@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
 import { Header } from './components/Header';
 import { Dashboard } from './components/Dashboard';
-import { GameCard } from './components/GameCard';
 import { GameTable } from './components/GameTable';
 import { ScrapingStatus } from './components/ScrapingStatus';
 import { useLotteryScraper } from './hooks/useLotteryScraper';
-import { Eye, BarChart3, Target, RefreshCw } from 'lucide-react';
+import { Target, RefreshCw } from 'lucide-react';
 
 function App() {
   const { games, status, isLoading, startScraping } = useLotteryScraper();
-  const [viewMode, setViewMode] = useState<'cards' | 'table'>('table');
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -26,41 +24,12 @@ function App() {
           <>
             <Dashboard games={games} />
             
-            <div className="flex justify-between items-center mb-6">
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900">Scratch-Off Data Analysis</h2>
-                <p className="text-gray-600">Detailed breakdown of all active scratch-off games</p>
-              </div>
-              
-              <div className="flex bg-gray-100 rounded-lg p-1">
-                <button
-                  onClick={() => setViewMode('cards')}
-                  className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
-                    viewMode === 'cards'
-                      ? 'bg-white text-blue-600 shadow-sm'
-                      : 'text-gray-500 hover:text-gray-700'
-                  }`}
-                >
-                  <Eye className="w-4 h-4 mr-2" />
-                  Cards
-                </button>
-                <button
-                  onClick={() => setViewMode('table')}
-                  className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
-                    viewMode === 'table'
-                      ? 'bg-white text-blue-600 shadow-sm'
-                      : 'text-gray-500 hover:text-gray-700'
-                  }`}
-                >
-                  <BarChart3 className="w-4 h-4 mr-2" />
-                  Table
-                </button>
-              </div>
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">Scratch-Off Data Analysis</h2>
+              <p className="text-gray-600">Detailed breakdown of all active scratch-off games</p>
             </div>
 
-            {viewMode === 'table' ? (
-              <GameTable games={games} />
-            ) : null}
+            <GameTable games={games} />
           </>
         )}
 

@@ -8,6 +8,7 @@ interface GameTableProps {
 }
 
 type SortField = 'expectedValue' | 'currentExpectedValue' | 'gameName' | 'roi' | 'currentOdds';
+type SortField = 'expectedValue' | 'currentExpectedValue' | 'gameName' | 'roi' | 'currentOdds' | 'evDelta';
 type SortDirection = 'asc' | 'desc';
 
 export function GameTable({ games }: GameTableProps) {
@@ -78,6 +79,10 @@ export function GameTable({ games }: GameTableProps) {
           const bOddsMatch = (b.currentOverallOdds ?? '').match(/1 in ([\d.]+)/);
           aValue = aOddsMatch ? parseFloat(aOddsMatch[1]) : 999999;
           bValue = bOddsMatch ? parseFloat(bOddsMatch[1]) : 999999;
+          break;
+        case 'evDelta':
+          aValue = (a.currentExpectedValue ?? 0) - (a.expectedValue ?? 0);
+          bValue = (b.currentExpectedValue ?? 0) - (b.expectedValue ?? 0);
           break;
         default:
           aValue = 0;
@@ -176,6 +181,15 @@ export function GameTable({ games }: GameTableProps) {
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 <button
+                  onClick={() => handleSort('evDelta')}
+                  className="flex items-center space-x-1 hover:text-gray-700"
+                >
+                  <span>EV Delta</span>
+                  <SortIcon field="evDelta" />
+                </button>
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <button
                   onClick={() => handleSort('roi')}
                   className="flex items-center space-x-1 hover:text-gray-700"
                 >
@@ -199,6 +213,7 @@ export function GameTable({ games }: GameTableProps) {
               const isExpanded = expandedRows.has(game.gameNumber || '');
               const currentOdds = calculateCurrentOdds(game);
               const prizeTierOdds = calculatePrizeTierOdds(game);
+              const evDelta = (game.currentExpectedValue ?? 0) - (game.expectedValue ?? 0);
               
               return (
                 <React.Fragment key={game.gameNumber || 0}>
@@ -232,6 +247,11 @@ export function GameTable({ games }: GameTableProps) {
                       </span>
                     </td>
                     <td className="px-6 py-4">
+                      <span className={`font-semibold ${getDeltaColor(evDelta)}`}>
+                        {evDelta >= 0 ? '+' : ''}${evDelta.toFixed(2)}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
                       <span className={`font-semibold ${getExpectedValueColor(game.expectedValue ?? 0)}`}>
                         {(((game.expectedValue ?? 0) / (game.ticketPrice ?? 1)) * 100).toFixed(1)}%
                       </span>
@@ -245,7 +265,7 @@ export function GameTable({ games }: GameTableProps) {
                   
                   {isExpanded && (
                     <tr>
-                      <td colSpan={6} className="px-6 py-4 bg-gray-50">
+                      <td colSpan={7} className="px-6 py-4 bg-gray-50">
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                           {/* Game Details */}
                           <div>
@@ -345,4 +365,10 @@ function getExpectedValueColor(ev: number) {
   if (ev > -1) return 'text-green-600';
   if (ev > -3) return 'text-yellow-600';
   return 'text-red-600';
+}
+
+function getDeltaColor(delta: number) {
+  if (delta > 0) return 'text-green-600';
+  if (delta < 0) return 'text-red-600';
+  return 'text-gray-600';
 }
