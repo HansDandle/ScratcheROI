@@ -1,5 +1,5 @@
 // Cloudflare Pages Function: scheduled-scraper
-import { scrapeAllGames } from '../netlify/functions/lottery-scraper-core.js';
+import { scrapeAllGames } from './lottery-scraper-cloudflare.js';
 
 export async function onRequest(context) {
   try {
