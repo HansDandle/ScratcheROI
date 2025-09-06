@@ -23,10 +23,10 @@ class LotteryScraper {
 
   private async fetchWithProxy(url: string): Promise<string> {
     try {
-      // Use Cloudflare Worker in production, Vite proxy in development
-      const proxyUrl = import.meta.env.DEV 
-        ? `/api${url}` 
-        : `/api/lottery-json`;
+      // Always use the Worker endpoint for scraping
+      const proxyUrl = import.meta.env.DEV
+        ? `/api/lottery-json` // In dev, proxy to local API route
+        : `/api/lottery-json`; // In prod, use deployed Worker
       const response = await fetch(proxyUrl);
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -35,7 +35,7 @@ class LotteryScraper {
       return data.games;
     } catch (error) {
       console.error('Fetch error:', error);
-      throw new Error(`Failed to fetch ${url}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(`Failed to fetch from Worker endpoint: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
