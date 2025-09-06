@@ -1,4 +1,5 @@
-import { parse } from 'node-html-parser';
+import { parseDocument } from 'htmlparser2';
+import { DomUtils } from 'htmlparser2';
 
 export default {
   async fetch(request, env, ctx) {
@@ -6,26 +7,30 @@ export default {
       const mainUrl = 'https://www.texaslottery.com/export/sites/lottery/Games/Scratch_Offs/all.html';
       const resp = await fetch(mainUrl, { headers: { 'User-Agent': 'Mozilla/5.0' } });
       const html = await resp.text();
-      const doc = parse(html);
-      let table = doc.querySelector('table');
-      if (!table) table = doc.querySelector('table.large-only');
-      if (!table) table = doc.querySelector('table:not([class])');
+      const doc = parseDocument(html);
+      // Find the main table using htmlparser2 utilities
+      let table = DomUtils.findOne(el => el.name === 'table', doc.children);
+      if (!table) table = DomUtils.findOne(el => el.name === 'table' && el.attribs && el.attribs.class === 'large-only', doc.children);
+      if (!table) table = DomUtils.findOne(el => el.name === 'table' && !el.attribs?.class, doc.children);
       if (!table) {
         return new Response(JSON.stringify({ error: 'Main table not found' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
       }
-      const rows = table.querySelectorAll('tr');
+      const rows = DomUtils.findAll(el => el.name === 'tr', table.children);
       const games = [];
       for (let i = 0; i < rows.length; ) {
         const row = rows[i];
-        const cells = row.querySelectorAll('td');
-        if (cells.length >= 7 && cells[0].text.trim() && cells[0].querySelector('a')) {
-          const gameNumberLink = cells[0].querySelector('a');
-          const gameNumber = gameNumberLink?.text.trim() || '';
-          const gameUrl = gameNumberLink?.getAttribute('href') || '';
+        const cells = DomUtils.findAll(el => el.name === 'td', row.children);
+  const cell0Text = cells[0] ? (DomUtils.textContent(cells[0]) || '') : '';
+  const hasGameLink = cells[0] ? DomUtils.findOne(el => el.name === 'a', cells[0].children || []) : null;
+  if (cells.length >= 7 && cell0Text.trim() && hasGameLink) {
+          const gameNumberLink = hasGameLink;
+          const gameNumber = (DomUtils.textContent(gameNumberLink) || '').trim();
+          const gameUrl = gameNumberLink?.attribs?.href || '';
           let extraRows = [];
           for (let j = 1; j <= 2 && i + j < rows.length; j++) {
-            const extraCells = rows[i + j].querySelectorAll('td');
-            if (!extraCells[0].text.trim() || extraCells.length < 7) {
+            const extraCells = DomUtils.findAll(el => el.name === 'td', rows[i + j].children);
+            const extraCell0Text = extraCells[0] ? (DomUtils.textContent(extraCells[0]) || '') : '';
+            if (!extraCell0Text.trim() || extraCells.length < 7) {
               extraRows.push(extraCells);
             } else {
               break;
@@ -48,24 +53,23 @@ export default {
               if (oddsMatch) {
                 overallOdds = `1 in ${oddsMatch[1]}`;
               }
-              // Continue to use node-html-parser for table parsing
-              const detailDoc = parse(detailHtml);
-              let detailTable = detailDoc.querySelector('table.large-only');
+              // Use htmlparser2 for table parsing
+              const detailDoc = parseDocument(detailHtml);
+              let detailTable = DomUtils.findOne(el => el.name === 'table' && el.attribs && el.attribs.class === 'large-only', detailDoc.children);
               if (!detailTable) {
-                const headers = detailDoc.querySelectorAll('h3, h4, th, td');
+                const headers = DomUtils.findAll(el => ['h3','h4','th','td'].includes(el.name), detailDoc.children);
                 for (const header of headers) {
-                  if (header.text.includes('Prizes Printed')) {
-                    const closestTable = header.closest('table');
-                    const parentTable = header.parentNode?.querySelector('table') ?? null;
-                    detailTable = closestTable || parentTable;
+                  if (DomUtils.textContent(header).includes('Prizes Printed')) {
+                    const closestTable = DomUtils.findOne(el => el.name === 'table', [header.parent]);
+                    detailTable = closestTable;
                     break;
                   }
                 }
               }
               if (!detailTable) {
-                const tables = detailDoc.querySelectorAll('table');
+                const tables = DomUtils.findAll(el => el.name === 'table', detailDoc.children);
                 for (const t of tables) {
-                  const headerText = t.text || '';
+                  const headerText = DomUtils.textContent(t) || '';
                   if (headerText.includes('Amount') && headerText.includes('No. in Game')) {
                     detailTable = t;
                     break;
@@ -73,15 +77,16 @@ export default {
                 }
               }
               if (detailTable) {
-                const detailRows = detailTable.querySelectorAll('tr');
+                const detailRows = DomUtils.findAll(el => el.name === 'tr', detailTable.children);
                 for (const dRow of detailRows) {
-                  const dCells = dRow.querySelectorAll('td');
+                  const dCells = DomUtils.findAll(el => el.name === 'td', dRow.children);
                   if (dCells.length >= 3) {
-                    const amount = dCells[0].text.trim() || '';
+                    const amount = dCells[0] ? (DomUtils.textContent(dCells[0]) || '').trim() : '';
                     if (!amount || amount.toLowerCase().includes('amount')) continue;
-                    const totalInGame = parseInt(dCells[1].text.replace(/,/g, '') || '0');
-                    const claimedText = dCells[2].text.trim() || '0';
-                    const prizesClaimed = claimedText === '---' ? 0 : parseInt(claimedText.replace(/,/g, '') || '0');
+                    const totalInGameRaw = dCells[1] ? (DomUtils.textContent(dCells[1]) || '').replace(/,/g, '').trim() : '';
+                    const totalInGame = totalInGameRaw === '---' || totalInGameRaw === '' ? 0 : parseInt(totalInGameRaw);
+                    const claimedTextRaw = dCells[2] ? (DomUtils.textContent(dCells[2]) || '').replace(/,/g, '').trim() : '';
+                    const prizesClaimed = claimedTextRaw === '---' || claimedTextRaw === '' ? 0 : parseInt(claimedTextRaw);
                     const remaining = totalInGame - prizesClaimed;
                     const odds = totalTickets > 0 ? `1 in ${Math.round(totalTickets / totalInGame).toLocaleString()}` : 'N/A';
                     prizeBreakdown.push({ amount, totalInGame, prizesClaimed, remaining, odds });
@@ -92,15 +97,25 @@ export default {
           } catch (err) {
             // If detail page fails, continue with basic info
           }
+          // Robustly handle '---' and missing values for all numeric fields
+          const startDate = cells[1] ? (DomUtils.textContent(cells[1]) || '').trim() : '';
+          const ticketPriceRaw = cells[2] ? (DomUtils.textContent(cells[2]) || '').replace('$', '').trim() : '';
+          const ticketPrice = ticketPriceRaw === '---' || ticketPriceRaw === '' ? 0 : parseFloat(ticketPriceRaw);
+          const gameName = cells[4] ? (DomUtils.textContent(cells[4]) || '').trim() : '';
+          const topPrizeAmount = cells[4] ? (DomUtils.textContent(cells[4]) || '').trim() : '';
+          const prizesPrintedRaw = cells[5] ? (DomUtils.textContent(cells[5]) || '').replace(/,/g, '').trim() : '';
+          const prizesPrinted = prizesPrintedRaw === '---' || prizesPrintedRaw === '' ? 0 : parseInt(prizesPrintedRaw);
+          const prizesClaimedRaw = cells[6] ? (DomUtils.textContent(cells[6]) || '').replace(/,/g, '').trim() : '';
+          const prizesClaimed = prizesClaimedRaw === '---' || prizesClaimedRaw === '' ? 0 : parseInt(prizesClaimedRaw);
           games.push({
             gameNumber,
             gameUrl,
-            startDate: cells[1].text.trim() || '',
-            ticketPrice: parseFloat(cells[2].text.replace('$', '') || '0'),
-            gameName: cells[4].text.trim() || '',
-            topPrizeAmount: cells[4].text.trim() || '',
-            prizesPrinted: parseInt(cells[5].text.replace(/,/g, '') || '0'),
-            prizesClaimed: cells[6].text.trim() === '---' ? 0 : parseInt(cells[6].text.replace(/,/g, '') || '0'),
+            startDate,
+            ticketPrice,
+            gameName,
+            topPrizeAmount,
+            prizesPrinted,
+            prizesClaimed,
             totalTickets,
             overallOdds,
             prizeBreakdown
