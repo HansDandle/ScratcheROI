@@ -23,10 +23,10 @@ class LotteryScraper {
 
   private async fetchWithProxy(url: string): Promise<string> {
     try {
-      // Always use the Worker endpoint for scraping
+      // Use local API route in dev, full Worker endpoint in prod
       const proxyUrl = import.meta.env.DEV
-        ? `/api/lottery-json` // In dev, proxy to local API route
-        : `/api/lottery-json`; // In prod, use deployed Worker
+        ? `/api/lottery-json`
+        : 'https://scratchscout-scraper.danshandle.workers.dev/';
       const response = await fetch(proxyUrl);
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
