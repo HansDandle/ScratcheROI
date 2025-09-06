@@ -16,7 +16,13 @@ export async function scrapeAllGames() {
   }
   // Log a snippet of the HTML for debugging
   if (!html || !html.startsWith('<!DOCTYPE html')) {
-    return [{ error: 'Main page did not return HTML', url: mainPageUrl, htmlSnippet: html?.slice(0, 100) }];
+    return [{
+      error: 'Main page did not return HTML',
+      url: mainPageUrl,
+      htmlSnippet: html?.slice(0, 2000),
+      fullHtmlLength: html?.length,
+      receivedHeaders: resp?.headers ? Object.fromEntries(resp.headers.entries()) : undefined
+    }];
   }
   const { document } = parseHTML(html);
 
@@ -25,7 +31,13 @@ export async function scrapeAllGames() {
   if (!table) table = document.querySelector('table.large-only');
   if (!table) table = document.querySelector('table:not([class])');
   if (!table) {
-    return [{ error: 'Main table not found', url: mainPageUrl, htmlSnippet: html.slice(0, 500) }];
+    return [{
+      error: 'Main table not found',
+      url: mainPageUrl,
+      htmlSnippet: html.slice(0, 5000),
+      fullHtmlLength: html.length,
+      receivedHeaders: resp.headers ? Object.fromEntries(resp.headers.entries()) : undefined
+    }];
   }
 
   const rows = Array.from(table.querySelectorAll('tbody tr'));

@@ -41,7 +41,7 @@ class LotteryScraper {
 
   private async fetchCachedData(): Promise<GameDetailedInfo[] | null> {
     try {
-  const response = await fetch('/api/scheduled-scraper');
+  const response = await fetch('/api/lottery-scraper');
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
