@@ -1,7 +1,4 @@
 name = "scratchscout-scraper"
-type = "javascript"
-main = "src/workers/scheduled-scraper.js"
+main = "src/workers/lottery-json.mjs"
 compatibility_date = "2025-09-05"
-
-[triggers]
-crons = ["0 12 * * *"]
+workers_dev = true
