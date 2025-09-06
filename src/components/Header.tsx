@@ -1,6 +1,6 @@
 import React from 'react';
 import { Target, RefreshCw } from 'lucide-react';
-import logo from '../../Scratch Scout Logo.png';
+import logo from '../../SSLogo2.png';
 
 interface HeaderProps {
   onStartScraping: () => void;
