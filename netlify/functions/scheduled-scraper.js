@@ -1,3 +1,4 @@
+// netlify-scheduled-function: 0 12 * * *
 const fetch = require('node-fetch');
 
 // This function runs daily at 6 AM CST (12 PM UTC)
