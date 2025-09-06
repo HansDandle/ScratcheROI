@@ -6,13 +6,6 @@
   directory = "netlify/functions"
   node_bundler = "esbuild"
 
-# Schedule the scraper to run daily at 6 AM CST (12 PM UTC)
-[[plugins]]
-  package = "@netlify/plugin-scheduled-functions"
-  
-  [plugins.inputs]
-    [plugins.inputs.scheduled-scraper]
-      schedule = "0 12 * * *"
 
 [[redirects]]
   from = "/*"
