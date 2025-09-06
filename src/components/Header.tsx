@@ -16,14 +16,12 @@ export function Header({ onStartScraping, isLoading, gamesCount, theme, onThemeT
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-14 sm:h-16">
           <div className="flex items-center">
-            <div className="flex items-center justify-center h-28 w-28 bg-white rounded-lg shadow-lg -mb-8 -mt-2 z-20 relative">
-              <img
-                src={logo}
-                alt="Scratch Scout Logo"
-                className="h-24 w-24"
-                style={{ boxShadow: '0 8px 32px rgba(0,0,0,0.25)' }}
-              />
-            </div>
+            <img
+              src={logo}
+              alt="Scratch Scout Logo"
+              className="h-24 w-24 mr-2 rounded shadow-lg -mb-8 -mt-2 z-20 relative"
+              style={{ boxShadow: '0 8px 32px rgba(0,0,0,0.25)' }}
+            />
             <div>
               <h1 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100">Scratch Scout (beta)</h1>
               <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 hidden sm:block">Smart scratch-off odds analysis</p>
