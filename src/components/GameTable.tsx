@@ -30,6 +30,23 @@ export function GameTable({ games, expandedRows, setExpandedRows }: GameTablePro
   const [sortField, setSortField] = useState<SortField>('currentExpectedValue');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   const [priceFilter, setPriceFilter] = useState<string>('all');
+  const [prizeThreshold, setPrizeThreshold] = useState<string>('none');
+
+  // Prize threshold options
+  const prizeThresholdOptions = [
+    { value: 'none', label: 'Any Prize' },
+    { value: 'double', label: 'Double Your Money' },
+    { value: '10000', label: '$10,000+' },
+    { value: '100000', label: '$100,000+' },
+    { value: '1000000', label: '$1,000,000+' },
+  ];
+
+  // Helper to get numeric threshold
+  const getThresholdAmount = (value: string, ticketPrice: number) => {
+    if (value === 'double') return ticketPrice * 2;
+    if (value === 'none') return 0;
+    return parseInt(value, 10);
+  };
 
   const toggleRow = (gameNumber: string) => {
     const newExpanded = new Set(expandedRows);
@@ -62,10 +79,24 @@ export function GameTable({ games, expandedRows, setExpandedRows }: GameTablePro
   const filteredAndSortedGames = useMemo(() => {
     let filtered = games;
 
+    // Filter by price
     if (priceFilter !== 'all') {
-      filtered = games.filter(game => (game.ticketPrice ?? 0).toString() === priceFilter);
+      filtered = filtered.filter(game => (game.ticketPrice ?? 0).toString() === priceFilter);
     }
 
+    // Filter by prize threshold
+    if (prizeThreshold !== 'none') {
+      filtered = filtered.filter(game => {
+        const threshold = getThresholdAmount(prizeThreshold, game.ticketPrice ?? 0);
+        // Find if any remaining prize meets threshold
+        return (game.prizeBreakdown ?? []).some(prize => {
+          const amount = typeof prize.amount === 'string' ? parseFloat(prize.amount.replace(/[$,]/g, '')) : prize.amount;
+          return amount >= threshold && prize.remaining > 0;
+        });
+      });
+    }
+
+    // Sort logic unchanged
     return filtered.sort((a, b) => {
       let aValue: number | string;
       let bValue: number | string;
@@ -116,7 +147,7 @@ export function GameTable({ games, expandedRows, setExpandedRows }: GameTablePro
 
       return sortDirection === 'asc' ? Number(aValue) - Number(bValue) : Number(bValue) - Number(aValue);
     });
-  }, [games, sortField, sortDirection, priceFilter]);
+  }, [games, sortField, sortDirection, priceFilter, prizeThreshold]);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -161,6 +192,17 @@ export function GameTable({ games, expandedRows, setExpandedRows }: GameTablePro
             <option value="all">All Prices</option>
             {uniquePrices.map(price => (
               <option key={price} value={price.toString()}>${price}</option>
+            ))}
+          </select>
+
+          <label className="text-sm font-medium text-gray-700">Best Odds of Winning At Least:</label>
+          <select
+            value={prizeThreshold}
+            onChange={e => setPrizeThreshold(e.target.value)}
+            className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 min-h-[44px] text-base"
+          >
+            {prizeThresholdOptions.map(opt => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
             ))}
           </select>
         </div>
