@@ -41,7 +41,7 @@ class LotteryScraper {
 
   private async fetchCachedData(): Promise<GameDetailedInfo[] | null> {
     try {
-      const response = await fetch('/.netlify/functions/get-cached-data');
+  const response = await fetch('/api/scheduled-scraper');
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
