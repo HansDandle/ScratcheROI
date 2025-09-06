@@ -9,10 +9,24 @@ interface GameTableProps {
   setExpandedRows: (expanded: Set<string>) => void;
 }
 
-type SortField = 'expectedValue' | 'currentExpectedValue' | 'gameName' | 'roi' | 'currentOdds' | 'evDelta';
+type SortField = 'expectedValue' | 'currentExpectedValue' | 'gameName' | 'roi' | 'currentOdds' | 'evDelta' | 'odds100k';
 type SortDirection = 'asc' | 'desc';
 
 export function GameTable({ games, expandedRows, setExpandedRows }: GameTableProps) {
+  // Helper to calculate odds of winning at least $100k
+  const calculateOdds100k = (game: GameDetailedInfo) => {
+    const remainingTickets = game.remainingTickets ?? 0;
+    // Find all prize tiers >= 100000
+    const qualifyingPrizes = (game.prizeBreakdown ?? []).filter(prize => {
+      const amount = typeof prize.amount === 'string' ? parseFloat(prize.amount.replace(/[$,]/g, '')) : prize.amount;
+      return amount >= 100000;
+    });
+    const totalRemaining = qualifyingPrizes.reduce((sum, prize) => sum + (prize.remaining ?? 0), 0);
+    if (remainingTickets > 0 && totalRemaining > 0) {
+      return `1 in ${Math.round(remainingTickets / totalRemaining).toLocaleString()}`;
+    }
+    return 'N/A';
+  };
   const [sortField, setSortField] = useState<SortField>('currentExpectedValue');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   const [priceFilter, setPriceFilter] = useState<string>('all');
@@ -83,6 +97,13 @@ export function GameTable({ games, expandedRows, setExpandedRows }: GameTablePro
         case 'evDelta':
           aValue = (a.currentExpectedValue ?? 0) - (a.expectedValue ?? 0);
           bValue = (b.currentExpectedValue ?? 0) - (b.expectedValue ?? 0);
+          break;
+        case 'odds100k':
+          // Extract numeric value from "1 in X" format for sorting
+          const aOdds100kMatch = calculateOdds100k(a).match(/1 in ([\d,]+)/);
+          const bOdds100kMatch = calculateOdds100k(b).match(/1 in ([\d,]+)/);
+          aValue = aOdds100kMatch ? parseInt(aOdds100kMatch[1].replace(/,/g, '')) : 999999;
+          bValue = bOdds100kMatch ? parseInt(bOdds100kMatch[1].replace(/,/g, '')) : 999999;
           break;
         default:
           aValue = 0;
@@ -199,6 +220,15 @@ export function GameTable({ games, expandedRows, setExpandedRows }: GameTablePro
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 <button
+                  onClick={() => handleSort('odds100k')} 
+                  className="flex items-center space-x-1 hover:text-gray-700"
+                >
+                  <span>Odds ≥ $100k</span>
+                  <SortIcon field="odds100k" />
+                </button>
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <button
                   onClick={() => handleSort('currentOdds')} 
                   className="flex items-center space-x-1 hover:text-gray-700"
                 >
@@ -214,7 +244,7 @@ export function GameTable({ games, expandedRows, setExpandedRows }: GameTablePro
               const currentOdds = calculateCurrentOdds(game);
               const prizeTierOdds = calculatePrizeTierOdds(game);
               const evDelta = (game.currentExpectedValue ?? 0) - (game.expectedValue ?? 0);
-              
+              const odds100k = calculateOdds100k(game);
               return (
                 <React.Fragment key={game.gameNumber || 0}>
                   <tr 
@@ -238,29 +268,22 @@ export function GameTable({ games, expandedRows, setExpandedRows }: GameTablePro
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`font-semibold ${getExpectedValueColor(game.currentExpectedValue ?? 0)}`}>
-                        ${(game.currentExpectedValue ?? 0).toFixed(2)}
-                      </span>
+                      <span className={`font-semibold ${getExpectedValueColor(game.currentExpectedValue ?? 0)}`}>${(game.currentExpectedValue ?? 0).toFixed(2)}</span>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`font-semibold ${getExpectedValueColor(game.expectedValue ?? 0)}`}>
-                        ${(game.expectedValue ?? 0).toFixed(2)}
-                      </span>
+                      <span className={`font-semibold ${getExpectedValueColor(game.expectedValue ?? 0)}`}>${(game.expectedValue ?? 0).toFixed(2)}</span>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`font-semibold ${getDeltaColor(evDelta)}`}>
-                        {evDelta >= 0 ? '+' : ''}${evDelta.toFixed(2)}
-                      </span>
+                      <span className={`font-semibold ${getDeltaColor(evDelta)}`}>{evDelta >= 0 ? '+' : ''}{evDelta.toFixed(2)}</span>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`font-semibold ${getExpectedValueColor(game.expectedValue ?? 0)}`}>
-                        {(((game.expectedValue ?? 0) / (game.ticketPrice ?? 1)) * 100).toFixed(1)}%
-                      </span>
+                      <span className={`font-semibold ${getExpectedValueColor(game.expectedValue ?? 0)}`}>{(((game.expectedValue ?? 0) / (game.ticketPrice ?? 1)) * 100).toFixed(1)}%</span>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="font-medium text-gray-900">
-                        {currentOdds}
-                      </span>
+                      <span className="font-medium text-gray-900">{odds100k}</span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="font-medium text-gray-900">{currentOdds}</span>
                     </td>
                   </tr>
                   
