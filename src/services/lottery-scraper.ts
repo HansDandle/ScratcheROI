@@ -26,12 +26,13 @@ class LotteryScraper {
       // Use Cloudflare Worker in production, Vite proxy in development
       const proxyUrl = import.meta.env.DEV 
         ? `/api${url}` 
-        : `/api/lottery-proxy?path=${encodeURIComponent(url)}`;
+        : `/api/lottery-json`;
       const response = await fetch(proxyUrl);
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
-      return await response.text();
+      const data = await response.json();
+      return data.games;
     } catch (error) {
       console.error('Fetch error:', error);
       throw new Error(`Failed to fetch ${url}: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -64,31 +65,37 @@ class LotteryScraper {
 
   private parseMainPageTable(html: string): GameBasicInfo[] {
     const games: GameBasicInfo[] = [];
-    
     try {
-      // Create a temporary DOM element to parse HTML
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, 'text/html');
-      
-      // Find the main table
-      const table = doc.querySelector('table');
-      if (!table) {
-        throw new Error('Main table not found');
-      }
+      // Fallback selectors for main table
+      let table = doc.querySelector('table');
+      if (!table) table = doc.querySelector('table.large-only');
+      if (!table) table = doc.querySelector('table:not([class])');
+      if (!table) throw new Error('Main table not found');
 
-      const rows = table.querySelectorAll('tbody tr');
-      
-      for (const row of rows) {
+      const rows = Array.from(table.querySelectorAll('tbody tr'));
+      let i = 0;
+      while (i < rows.length) {
+        const row = rows[i];
         const cells = row.querySelectorAll('td');
-        if (cells.length >= 7 && cells[0].textContent?.trim()) {
-          // Only process rows that have a game number (first cell has content)
-          // This skips the additional prize tier rows that have empty first cells
+        // Identify a game row by first cell having a link and content
+        if (cells.length >= 7 && cells[0].textContent?.trim() && cells[0].querySelector('a')) {
           const gameNumberLink = cells[0].querySelector('a');
-          if (!gameNumberLink) continue; // Skip if no link found
-          
           const gameNumber = gameNumberLink?.textContent?.trim() || '';
           const gameUrl = gameNumberLink?.getAttribute('href') || '';
-          
+          // Optionally, gather extra info from the next two rows
+          let extraRows = [];
+          for (let j = 1; j <= 2 && i + j < rows.length; j++) {
+            const extraCells = rows[i + j].querySelectorAll('td');
+            // Heuristic: extra rows have empty first cell or fewer columns
+            if (!extraCells[0].textContent?.trim() || extraCells.length < 7) {
+              extraRows.push(extraCells);
+            } else {
+              break;
+            }
+          }
+          // You can process extraRows here if needed for more details
           games.push({
             gameNumber,
             gameUrl,
@@ -99,12 +106,14 @@ class LotteryScraper {
             prizesPrinted: parseInt(cells[5].textContent?.replace(/,/g, '') || '0'),
             prizesClaimed: cells[6].textContent?.trim() === '---' ? 0 : parseInt(cells[6].textContent?.replace(/,/g, '') || '0')
           });
+          i += 1 + extraRows.length;
+        } else {
+          i++;
         }
       }
     } catch (error) {
       throw new Error(`Failed to parse main page: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
-
     return games;
   }
 
@@ -138,7 +147,9 @@ class LotteryScraper {
         const headers = doc.querySelectorAll('h3, h4, th, td');
         for (const header of headers) {
           if (header.textContent?.includes('Prizes Printed')) {
-            table = header.closest('table') || header.parentElement?.querySelector('table');
+            const closestTable = header.closest('table');
+            const parentTable = header.parentElement?.querySelector('table') ?? null;
+            table = closestTable || parentTable;
             break;
           }
         }
