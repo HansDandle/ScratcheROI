@@ -39,16 +39,17 @@ export default {
             if (gameUrl) {
               const detailResp = await fetch('https://www.texaslottery.com' + gameUrl, { headers: { 'User-Agent': 'Mozilla/5.0' } });
               const detailHtml = await detailResp.text();
-              const detailDoc = parse(detailHtml);
-              const bodyText = detailDoc.text || '';
-              const ticketMatch = bodyText.match(/There are approximately ([\d,]+)\*?\s*tickets/i);
+              // Use raw HTML for regex extraction
+              const ticketMatch = detailHtml.match(/There are approximately ([\d,]+)\*?\s*tickets/i);
               if (ticketMatch) {
                 totalTickets = parseInt(ticketMatch[1].replace(/,/g, ''));
               }
-              const oddsMatch = bodyText.match(/Overall odds of winning any prize[^0-9]*are\s+1\s+in\s+([\d.]+)/i);
+              const oddsMatch = detailHtml.match(/Overall odds of winning any prize[^0-9]*are\s+1\s+in\s+([\d.]+)/i);
               if (oddsMatch) {
                 overallOdds = `1 in ${oddsMatch[1]}`;
               }
+              // Continue to use node-html-parser for table parsing
+              const detailDoc = parse(detailHtml);
               let detailTable = detailDoc.querySelector('table.large-only');
               if (!detailTable) {
                 const headers = detailDoc.querySelectorAll('h3, h4, th, td');
