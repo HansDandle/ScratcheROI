@@ -10,6 +10,15 @@ function App() {
   const { games, status, isLoading, startScraping } = useLotteryScraper();
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
+  // Theme state: default to dark
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+  React.useEffect(() => {
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+  }, [theme]);
+  const handleThemeToggle = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+  };
+
   const handleNavigateToGame = (gameNumber: string) => {
     // Expand the target game
     const newExpanded = new Set(expandedRows);
@@ -26,11 +35,13 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className={theme === 'dark' ? 'min-h-screen bg-gray-50 dark' : 'min-h-screen bg-gray-50'}>
       <Header 
         onStartScraping={startScraping}
         isLoading={isLoading}
         gamesCount={games.length}
+        theme={theme}
+        onThemeToggle={handleThemeToggle}
       />
       
       <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">

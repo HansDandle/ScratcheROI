@@ -1,3 +1,41 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Enable dark mode via class strategy */
+@layer base {
+	html.dark {
+		color-scheme: dark;
+	}
+}
+
+@layer components {
+	.dark .bg-gray-50 {
+		background-color: #18181b !important;
+	}
+	.dark .bg-white {
+		background-color: #232326 !important;
+	}
+	.dark .text-gray-900 {
+		color: #f3f4f6 !important;
+	}
+	.dark .text-gray-700 {
+		color: #d1d5db !important;
+	}
+	.dark .text-gray-500 {
+		color: #a1a1aa !important;
+	}
+	.dark .border-gray-200 {
+		border-color: #2a2a2e !important;
+	}
+	.dark .shadow-lg {
+		box-shadow: 0 4px 24px rgba(0,0,0,0.8) !important;
+	}
+	.dark .bg-blue-50 {
+		background-color: #1e293b !important;
+	}
+	.dark .text-blue-800 {
+		color: #60a5fa !important;
+	}
+}

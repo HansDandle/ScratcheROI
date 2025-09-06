@@ -76,12 +76,20 @@ export function GameTable({ games, expandedRows, setExpandedRows }: GameTablePro
     });
   };
 
+  // Get unique prices and build 'X and less' options
+  const uniquePrices = Array.from(new Set(games.map(game => game.ticketPrice ?? 0))).sort((a, b) => a - b);
+  const priceFilterOptions = uniquePrices.map(price => ({
+    value: price.toString(),
+    label: `$${price} and less`
+  }));
+
   const filteredAndSortedGames = useMemo(() => {
     let filtered = games;
 
-    // Filter by price
+    // Filter by price (less than or equal to selected)
     if (priceFilter !== 'all') {
-      filtered = filtered.filter(game => (game.ticketPrice ?? 0).toString() === priceFilter);
+      const maxPrice = parseFloat(priceFilter);
+      filtered = filtered.filter(game => (game.ticketPrice ?? 0) <= maxPrice);
     }
 
     // Filter by prize threshold
@@ -173,8 +181,6 @@ export function GameTable({ games, expandedRows, setExpandedRows }: GameTablePro
     return 'N/A';
   };
 
-  const uniquePrices = Array.from(new Set(games.map(game => game.ticketPrice ?? 0))).sort((a, b) => a - b);
-
   return (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden">
       <div className="p-4 sm:p-6 border-b border-gray-200">
@@ -190,8 +196,8 @@ export function GameTable({ games, expandedRows, setExpandedRows }: GameTablePro
             className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 min-h-[44px] text-base"
           >
             <option value="all">All Prices</option>
-            {uniquePrices.map(price => (
-              <option key={price} value={price.toString()}>${price}</option>
+            {priceFilterOptions.map(opt => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
             ))}
           </select>
 
@@ -422,6 +428,17 @@ export function GameTable({ games, expandedRows, setExpandedRows }: GameTablePro
         <div className="sticky bottom-0 bg-white">
           <StickyScrollbar targetSelector=".overflow-x-auto" />
         </div>
+      </div>
+
+      {/* Explainer Section */}
+      <div className="max-w-3xl mx-auto mt-8 mb-8 p-6 rounded-lg bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 shadow-md">
+        <h3 className="text-lg font-semibold mb-3">What do these numbers mean?</h3>
+        <ul className="space-y-2 text-base">
+          <li><strong>Odds:</strong> The chance of winning a prize in the game, usually shown as "1 in X". Lower numbers mean better odds.</li>
+          <li><strong>Current EV (Expected Value):</strong> The average amount you can expect to win per ticket, based on the current number of remaining prizes and tickets. This updates as prizes are claimed.</li>
+          <li><strong>Expected EV:</strong> The average amount you could expect to win per ticket at the start of the game, before any prizes were claimed.</li>
+          <li><strong>ROI (Return on Investment):</strong> The percentage of your ticket price you can expect to get back, on average. ROI = (Expected Value / Ticket Price) × 100%. Higher ROI means better value.</li>
+        </ul>
       </div>
     </div>
   );
