@@ -59,6 +59,14 @@ export function ScrapingStatus({ status }: ScrapingStatusProps) {
             </ul>
           </div>
         )}
+
+        {!status.isActive && status.gamesProcessed === 0 && status.errors.length === 0 && (
+          <div className="p-4 bg-gray-100 rounded-lg text-center">
+            <p className="text-sm text-gray-500">
+              Tap the button to scrape all Texas Lottery scratch-off data
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

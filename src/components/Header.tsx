@@ -1,5 +1,6 @@
 import React from 'react';
 import { Target, RefreshCw } from 'lucide-react';
+import logo from '../../Scratch Scout Logo.png';
 
 interface HeaderProps {
   onStartScraping: () => void;
@@ -15,9 +16,9 @@ export function Header({ onStartScraping, isLoading, gamesCount, theme, onThemeT
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-14 sm:h-16">
           <div className="flex items-center">
-            <Target className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600 mr-2 sm:mr-3" />
+            <img src={logo} alt="Scratch Scout Logo" className="h-8 w-8 mr-2 rounded shadow-sm bg-white dark:bg-gray-900" />
             <div>
-              <h1 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100">Texas Lottery Analyzer</h1>
+              <h1 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100">Scratch Scout (beta)</h1>
               <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 hidden sm:block">Smart scratch-off odds analysis</p>
             </div>
           </div>
