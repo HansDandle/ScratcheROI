@@ -19,7 +19,7 @@ export function Header({ onStartScraping, isLoading, gamesCount, theme, onThemeT
             <img
               src={logo}
               alt="Scratch Scout Logo"
-              className="h-24 w-24 mr-2 rounded shadow-lg -mb-8 -mt-2 z-20 relative"
+              className="h-24 w-24 mr-2 rounded shadow-lg -mt-1 -mb-10 z-20 relative"
               style={{ boxShadow: '0 8px 32px rgba(0,0,0,0.25)' }}
             />
             <div>
