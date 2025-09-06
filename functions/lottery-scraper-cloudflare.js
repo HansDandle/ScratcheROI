@@ -62,37 +62,6 @@ export async function scrapeAllGames() {
     }
   }
 
-  // Fetch details for each game with error handling
-  const detailedGames = [];
-  for (const game of games) {
-    try {
-      const detailUrl = 'https://www.texaslottery.com' + game.gameUrl;
-      const detailResp = await fetch(detailUrl, { headers: { 'User-Agent': 'Mozilla/5.0' } });
-      if (!detailResp.ok) {
-        throw new Error(`Detail page fetch failed: HTTP ${detailResp.status}`);
-      }
-      const detailHtml = await detailResp.text();
-      const { document: detailDoc } = parseHTML(detailHtml);
-      let totalTickets = 0;
-      let overallOdds = 'N/A';
-      const bodyText = detailDoc.body.textContent || '';
-      const ticketMatch = bodyText.match(/There are approximately ([\d,]+)\*?\s*tickets/i);
-      if (ticketMatch) {
-        totalTickets = parseInt(ticketMatch[1].replace(/,/g, ''));
-      }
-      const oddsMatch = bodyText.match(/Overall odds of winning any prize[^0-9]*are\s+1\s+in\s+([\d.]+)/i);
-      if (oddsMatch) {
-        overallOdds = `1 in ${oddsMatch[1]}`;
-      }
-      detailedGames.push({
-        ...game,
-        totalTickets,
-        overallOdds
-      });
-      await new Promise(resolve => setTimeout(resolve, 250));
-    } catch (error) {
-      detailedGames.push({ ...game, error: error.message });
-    }
-  }
-  return detailedGames;
+  // Return only main table data to avoid Worker timeouts
+  return games;
 }
