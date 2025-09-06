@@ -1,0 +1,7 @@
+name = "scratchscout-scraper"
+type = "javascript"
+main = "src/workers/scheduled-scraper.js"
+compatibility_date = "2025-09-05"
+
+[triggers]
+crons = ["0 12 * * *"]
