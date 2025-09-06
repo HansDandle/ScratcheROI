@@ -17,20 +17,19 @@ exports.handler = async (event, context) => {
     // Perform the scraping
     const games = await scrapeAllGames();
     
-    // Save cache to /tmp/lottery-cache.json
-    const fs = require('fs');
-    const cachePath = '/tmp/lottery-cache.json';
+    // Store the data (you could use a database here, but for now we'll return it)
+    // In a real implementation, you'd store this in a database or file storage
     const result = {
       games,
       lastUpdated: new Date().toISOString(),
       totalGames: games.length
     };
-    try {
-      fs.writeFileSync(cachePath, JSON.stringify(result));
-      console.log('Cache written to', cachePath);
-    } catch (err) {
-      console.error('Failed to write cache:', err);
-    }
+    
+    console.log(`Successfully scraped ${games.length} games`);
+    
+    // You could store this in Netlify's environment variables, a database, or file storage
+    // For now, we'll just log success
+    
     return {
       statusCode: 200,
       headers,

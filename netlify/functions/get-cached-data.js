@@ -16,25 +16,39 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    // In a real implementation, you'd fetch this from a database or file storage
-    // For now, we'll trigger a fresh scrape if no cached data exists
-    // This is a fallback - ideally the scheduled function would populate a database
-    
-    const { scrapeAllGames } = require('./lottery-scraper-core');
-    
-    // Check if we should return cached data or fresh data
-    // You could implement caching logic here with a database or file storage
-    
-    console.log('Fetching fresh lottery data...');
-    const games = await scrapeAllGames();
-    
-    const result = {
-      games,
-      lastUpdated: new Date().toISOString(),
-      totalGames: games.length,
-      cached: false
-    };
-    
+    const fs = require('fs');
+    const cachePath = '/tmp/lottery-cache.json';
+    let result = null;
+    if (fs.existsSync(cachePath)) {
+      const cacheData = JSON.parse(fs.readFileSync(cachePath, 'utf8'));
+      // Check if cache is less than 24 hours old
+      const lastUpdate = new Date(cacheData.lastUpdated);
+      const now = new Date();
+      const hoursSinceUpdate = (now.getTime() - lastUpdate.getTime()) / (1000 * 60 * 60);
+      if (hoursSinceUpdate < 24) {
+        result = { ...cacheData, cached: true };
+        console.log('Serving cached lottery data');
+      }
+    }
+    if (!result) {
+      // No valid cache, scrape fresh
+      const { scrapeAllGames } = require('./lottery-scraper-core');
+      console.log('Fetching fresh lottery data...');
+      const games = await scrapeAllGames();
+      result = {
+        games,
+        lastUpdated: new Date().toISOString(),
+        totalGames: games.length,
+        cached: false
+      };
+      // Optionally update cache here as well
+      try {
+        fs.writeFileSync(cachePath, JSON.stringify(result));
+        console.log('Cache updated after fresh scrape');
+      } catch (err) {
+        console.error('Failed to update cache:', err);
+      }
+    }
     return {
       statusCode: 200,
       headers,
